@@ -6,7 +6,13 @@ A mini audio visualizer using raylib and miniaudio. The project aims to make a t
 
 *Music: Criticaleye, Shiro - shadows, provided by NoCopyrightSounds*
 
-https://github.com/user-attachments/assets/6d7cbca3-eb09-4e76-a883-8d47b3781e93
+
+https://github.com/user-attachments/assets/c2b8e241-b13f-496b-b6cd-4742ddeb5d14
+
+## Screenshots
+
+<img width="1599" height="896" alt="screenshot-20251228-175453" src="https://github.com/user-attachments/assets/eee3a742-513c-4a84-b91f-759b21743d77" />
+<img width="1599" height="899" alt="screenshot-20251228-175438" src="https://github.com/user-attachments/assets/b6ce940c-3073-4357-bf89-7ca6ac3e017a" />
 
 ## Credit
 
