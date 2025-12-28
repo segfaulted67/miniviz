@@ -79,7 +79,7 @@ int main(void)
 
 	float display_height[num_bar] = { 0 };
 
-	float padding = 100.0f;
+	float padding = 50.0f;
 	float x_pos = 0.0f;
 	float y_pos = 5.0f;
 
@@ -134,9 +134,9 @@ int main(void)
       float t = (float)i / num_bar;
       int bin_index = (int)(powf(t, 1.5f) * (N / 4));
 
-      float mag = cabsf(audio_output[bin_index]) * 10.0f;
+      float mag = cabsf(audio_output[bin_index]) * 20.0f;
       /* Logrithmic scaling */
-      float log_scaled_mag = log10f(1.0f + mag) * 20.0f;
+      float log_scaled_mag = log10f(mag + 1e-7) * 40.0f;
       if (log_scaled_mag < 0)   log_scaled_mag = 0.0f;
 
       /* Time smoothing: https://dlbeer.co.nz/articles/fftvis.html 				 */
@@ -147,25 +147,25 @@ int main(void)
 
 			switch(mode) {
 			case MODE_CENTER_LINE:
-				barHeight = clamp(display_height[i] * 2.5f, 0.0f, HEIGHT/2 - 20);
+				barHeight = clamp(display_height[i] * 1.5f, 0.0f, HEIGHT/2 - 20);
 				DrawRectangle(x_pos, HEIGHT / 2 - barHeight - y_pos, barWidth + 1.0f, barHeight, color);
 				DrawRectangle(x_pos, HEIGHT / 2 + y_pos, barWidth + 1.0f, barHeight, color);
 				break;
 			case MODE_BOTTOM_UP:
-				barHeight = clamp(display_height[i] * 2.5f, 0.0f, HEIGHT - 50);
+				barHeight = clamp(display_height[i] * 1.5f, 0.0f, HEIGHT - 50);
 				DrawRectangle(x_pos, HEIGHT - barHeight - y_pos - 20, barWidth + 1.0f, barHeight, color);
 				break;
 			case MODE_UP_BOTTOM:
-				barHeight = clamp(display_height[i] * 2.5f, 0.0f, HEIGHT - 50);
+				barHeight = clamp(display_height[i] * 1.5f, 0.0f, HEIGHT - 50);
 				DrawRectangle(x_pos, y_pos + 20, barWidth + 1.0f, barHeight, color);
 				break;
 			case MODE_UP_AND_BOTTOM:
-				barHeight = clamp(display_height[i] * 2.5f, 0.0f, HEIGHT / 2 - 40);
+				barHeight = clamp(display_height[i] * 1.5f, 0.0f, HEIGHT / 2 - 40);
 				DrawRectangle(x_pos, HEIGHT - barHeight - y_pos - 20, barWidth + 1.0f, barHeight, color);
 				DrawRectangle(x_pos, y_pos + 20, barWidth + 1.0f, barHeight, color);
 				break;
 			case MODE_CIRCLE:
-				barHeight = clamp(display_height[i] * 2.5f, 0.0f, HEIGHT - 50);
+				barHeight = clamp(display_height[i] * 1.5f, 0.0f, HEIGHT - 50);
 				DrawCircle(x_pos + (barWidth / 2), HEIGHT - barHeight - y_pos - 20, barWidth / 2 - 1.0f, color);
 				break;
 			case MAX_MODE:
