@@ -1,6 +1,6 @@
 # MiniViz
 
-A mini audio visualizer using raylib and miniaudio. The project aims to make a tool for creating simple music visualizations.
+A mini audio visualizer using raylib and miniaudio.
 
 ## Demo
 
