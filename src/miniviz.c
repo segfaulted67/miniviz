@@ -1,4 +1,3 @@
-
 #include <string.h>
 #include <raylib.h>
 
@@ -45,26 +44,27 @@ typedef enum {
 /* callback function required by miniaudio */
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount)
 {
-    if (pInput == NULL) return;
+  if (pInput == NULL) return;
 
-    float *fbuffer = (float *)pInput;
-    int channels = pDevice->capture.channels;
+  float *fbuffer = (float *)pInput;
+  int channels = pDevice->capture.channels;
 
-    if (frameCount < N) {
-        memmove(sample, sample + frameCount, (N - frameCount) * sizeof(float));
+  if (frameCount < N) {
+    memmove(sample, sample + frameCount, (N - frameCount) * sizeof(float));
+  }
+
+  for (unsigned int i = 0; i < frameCount; i++) {
+    if (i >= N) break;
+
+    float mixed_sample = 0;
+    if (channels == 2) {
+      mixed_sample = (fbuffer[i * 2] + fbuffer[i * 2 + 1]) / 2.0f;
+    }
+    else {
+      mixed_sample = fbuffer[i];
     }
 
-    for (unsigned int i = 0; i < frameCount; i++) {
-        if (i >= N) break;
-
-        float mixed_sample = 0;
-        if (channels == 2) {
-            mixed_sample = (fbuffer[i * 2] + fbuffer[i * 2 + 1]) / 2.0f;
-        } else {
-            mixed_sample = fbuffer[i];
-        }
-
-        sample[N - frameCount + i] = mixed_sample;
+      sample[N - frameCount + i] = mixed_sample;
     }
     (void)pOutput;
 }
@@ -87,14 +87,15 @@ static inline float clamp(float value, float min, float max)
 
 int main(void)
 {
+  /* Current height and width of the window */
 	static int current_height = HEIGHT;
 	static int current_width = WIDTH;
 	static float bass_intensity = 0.0f;
 
 	VisualMode mode = MODE_CENTER_LINE;
 
-	_Complex float audio_input[N] = { 0 };
-	_Complex float audio_output[N] = { 0 };
+	F_Complex audio_input[N] = { 0 };
+	F_Complex audio_output[N] = { 0 };
 
 	float display_height[num_bar] = { 0 };
 
@@ -131,7 +132,6 @@ int main(void)
 	config.pUserData        	 = NULL;
 	config.capture.pDeviceID 	 = NULL;
 
-
 	ma_device device;
 	if (ma_device_init(&context, &config, &device) != MA_SUCCESS) {
 			return 1;
@@ -158,34 +158,36 @@ int main(void)
 		}
 
 		/* Calculating bass intensity of music */
+		bass_intensity = 0.0f;
 		for (int i = 0; i < 16; i++) {
 			bass_intensity += display_height[i];
 		}
 		bass_intensity /= 16.0f;
 
 
-		fft(audio_input, audio_output, N);
+		fft_bit(audio_input, audio_output, N);
 
 		BeginDrawing();
 
-		unsigned char bass_val = (unsigned char)clamp(bass_intensity * 0.5f, 0, 80);
+		unsigned char bass_val = (unsigned char)clamp(bass_intensity, 0, 80);
 		BGcolor = (Color){ bass_val, bass_val / 2, bass_val, 255 };
 		ClearBackground(BGcolor);
-		bass_intensity = 0.0f;
 
 		/* Width and Height of each bars */
 		float barWidth = (float)(current_width - padding) / num_bar;
 		float barHeight = 0.0f;
 
 		for (int i = 0; i < num_bar; i++) {
-			/* Calculating hue color in order to get rainbow color */
+			/* Calculating hue in order to get rainbow color */
 			float hue = (float)i / num_bar * 300.0f;
 			color = ColorFromHSV(hue, 0.7f, 0.9f);
 
       /* int bin_index = i; */
       /* Gamma-corrected frequency range: https://dlbeer.co.nz/articles/fftvis.html */
       float t = (float)i / num_bar;
-      int bin_index = (int)(powf(t, 0.5f) * (N / 4));
+      int bin_index = (int)(powf(t, 0.4f) * (N / 4));
+			bin_index = clamp(bin_index, 1, (N / 4) - 1);
+
 
 			/* Magnitude of each frequency */
       float mag = cabsf(audio_output[bin_index]) * 16.0f;
@@ -240,6 +242,9 @@ int main(void)
 
 		}
 
+    if (IsKeyPressed(KEY_F)) {
+      ToggleFullscreen();
+    }
 		/* Press n to go to next mode */
 		if (IsKeyPressed(KEY_N)) {
 			mode = (mode + 1) % MAX_MODE;
